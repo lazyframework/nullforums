@@ -1,0 +1,23 @@
+{
+  "name": "nullforums/app",
+  "description": "NullForums - forum komunitas PHP 8.4",
+  "type": "project",
+  "require": {
+    "php": ">=8.4",
+    "ext-pdo": "*",
+    "ext-mbstring": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "NF\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

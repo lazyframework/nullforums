@@ -1,0 +1,1131 @@
+/* ============================================================
+   1. VARIABEL & RESET
+   ============================================================ */
+:root{
+  --bg-0:#070707;
+  --bg-1:#0e0e0e;
+  --bg-2:#141414;
+  --bg-3:#1b1b1b;
+  --border:#242424;
+  --red:#e01b1b;
+  --red-dark:#a51212;
+  --red-glow:rgba(224,27,27,.35);
+  --text:#d6d6d6;
+  --text-dim:#8a8a8a;
+  --text-bright:#f2f2f2;
+  --radius:4px;
+  --font:'Bebas Neue', sans-serif;
+  --header-h:60px;
+  --drawer-w:280px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:radial-gradient(1200px 400px at 50% -100px, rgba(224,27,27,.08), transparent 70%),var(--bg-0);
+  color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;
+  min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%;
+}
+a{color:var(--red);text-decoration:none}
+a:hover{color:#ff4d4d}
+
+/* Kategori kosong di beranda: satu baris */
+.cat-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--text-bright);
+}
+.cat-link:hover { border-color: var(--red); }
+
+.cat-link-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(224, 27, 27, 0.15);
+  border: 1px solid rgba(224, 27, 27, 0.35);
+  display: grid;
+  place-items: center;
+  color: var(--red);
+  flex-shrink: 0;
+}
+
+.cat-link-name {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+  font-size: 16px;
+  flex: 1;
+}
+
+.cat-link-count {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Tautan "View all" di bawah daftar thread */
+.view-all {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--red);
+  border-top: 1px solid var(--border);
+}
+
+/* Tombol pagination beranda: redup dan tidak bisa diklik saat disabled */
+.slider-btn:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+/* Ukuran ikon global */
+i.ti {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Ukuran khusus per area */
+.tab i.ti           { font-size: 16px; }
+.drawer-nav .di i   { font-size: 18px; }
+.cat-head .icon i   { font-size: 16px; }
+.f-icon i           { font-size: 20px; }
+.btn-delete-thread i { font-size: 16px; }
+
+/* ============================================================
+   2. CUSTOM FONTS (INTER & SPACE GROTESK & BEBAS NEUE)
+   ============================================================ */
+body, 
+.form-input, 
+.form-textarea, 
+input, 
+textarea {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.logo, 
+nav.main a, 
+.drawer-nav a,
+.btn,
+.hero h1,
+.f-name,
+.cat-head h3,
+.pti-title,
+.jumbo-content h1,
+.jumbo-stats .num {
+  font-family: 'Bebas Neue', sans-serif !important;
+  letter-spacing: 1px;
+}
+
+.logo { font-size: 25px !important; letter-spacing: 1.5px; font-family: "Bebas Neue", sans-serif; font-weight: bolder !important;}
+.btn { font-weight: 600; letter-spacing: 0.3px; }
+
+/* ============================================================
+   3. HEADER & NAVBAR
+   ============================================================ */
+header{background:linear-gradient(180deg,#0b0b0b,#080808);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:60;box-shadow:0 2px 20px rgba(0,0,0,.6)}
+.topbar{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:11px 20px;min-height:var(--header-h);flex-wrap:nowrap}
+
+.logo{display:flex;align-items:center;font-weight:800;font-size:19px;letter-spacing:.5px;color:var(--text-bright);white-space:nowrap;flex-shrink:0}
+.logo .f{color:var(--red)}
+
+nav.main{display:flex;gap:4px;flex:1;flex-wrap:nowrap}
+nav.main a{color:var(--text-dim);padding:7px 12px;border-radius:6px;font-weight:600;font-size:13.5px;transition:.15s;white-space:nowrap}
+nav.main a:hover,nav.main a.active{color:var(--text-bright);background:var(--bg-3)}
+nav.main a.active{color:var(--red)}
+
+.user-area{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.btn{border:1px solid var(--border);background:var(--bg-2);color:var(--text);padding:7px 16px;border-radius:6px;font-weight:600;font-size:13px;cursor:pointer;transition:.15s;font-family:var(--font);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn:hover{background:var(--bg-3);border-color:#333;color:var(--text-bright)}
+.btn-primary{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 14px var(--red-glow)}
+.btn-primary:hover{background:#ff2a2a;border-color:#ff2a2a;color:#fff}
+
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--red-dark),#3a0606);display:grid;place-items:center;font-weight:700;color:#fff;font-size:13px;border:1px solid var(--red-dark);cursor:pointer;flex-shrink:0; overflow: hidden; padding: 0;}
+.avatar img { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 50% !important; }
+
+.menu-toggle{display:none;width:40px;height:40px;border-radius:6px;background:var(--bg-2);border:1px solid var(--border);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0;flex-shrink:0}
+.menu-toggle span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:.25s}
+.menu-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--red)}
+.menu-toggle.open span:nth-child(2){opacity:0}
+.menu-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--red)}
+
+/* Kotak Pencarian */
+.search-bar{display:flex;align-items:center;background:var(--bg-2);border:1px solid var(--border);border-radius:6px;padding:0 10px;height:34px;transition:.2s;flex-shrink: 0;}
+.search-bar:focus-within{border-color:var(--red);box-shadow:0 0 10px rgba(224,27,27,.2)}
+.search-bar .search-icon{font-size:12px;color:var(--text-dim);margin-right:6px}
+.search-bar input{background:transparent;border:none;color:var(--text-bright);font-family:var(--font);font-size:12.5px;outline:none;width:140px}
+.search-bar input::placeholder{color:var(--text-dim)}
+
+/* ============================================================
+   4. LAYOUT
+   ============================================================ */
+.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+.grid-2{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
+.grid-2 > main{min-width:0}
+
+.grid-1{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;align-items:start;width:100%}
+.grid-1 > main{min-width:0;width:100%}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#120404 0%,var(--bg-1) 60%);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--radius);padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap; margin-bottom: 22px;}
+.hero h1{font-size:22px;color:var(--text-bright);font-weight:800;line-height:1.3}
+.hero h1 b{color:var(--red)}
+.hero p{color:var(--text-dim);font-size:13px;margin-top:4px;max-width:520px}
+.stats{display:flex;gap:26px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .num{font-size:20px;font-weight:800;color:var(--red);text-shadow:0 0 16px var(--red-glow)}
+.stat .lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px}
+
+/* ============================================================
+   5. JUMBOTRON
+   ============================================================ */
+.jumbotron {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 22px;
+  border: 1px solid var(--border);
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--bg-1);
+}
+.jumbo-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  z-index: 1;
+}
+.jumbotron::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7,7,7,0.2) 0%, rgba(7,7,7,0.9) 100%);
+  z-index: 2;
+}
+.jumbo-content {
+  position: relative;
+  z-index: 3;
+  padding: 30px 20px;
+  max-width: 800px;
+}
+.jumbo-content h1 {
+  font-size: 32px !important;
+  color: var(--text-bright);
+  font-weight: 800;
+  line-height: 1.2;
+  font-style: italic;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+.jumbo-content h1 b {
+  color: var(--red);
+  text-shadow: 0 0 20px var(--red-glow);
+}
+.jumbo-content p {
+  color: var(--text);
+  font-size: 15px;
+  margin-bottom: 24px;
+  text-shadow: 0 1px 5px rgba(0,0,0,0.8);
+}
+.jumbo-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+.jumbo-stats .stat {
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border);
+  padding: 10px 20px;
+  border-radius: 8px;
+  min-width: 80px;
+}
+.jumbo-stats .num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--red);
+}
+.jumbo-stats .lbl {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   6. NAVIGASI TAB & SUBNAV
+   ============================================================ */
+.nav-container{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius);padding:8px;margin-bottom:22px}
+.tabs-wrap{position:relative;display:flex;align-items:center;gap:6px;min-width:0}
+.tabs-wrap .tabs{flex:1;margin-bottom:0;min-width:0}
+.tabs{display:flex;gap:12px !important;background:transparent;border:none;padding:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-radius: 1px;scroll-behavior:smooth}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--text-dim);font-family: "Bebas Neue", sans-serif;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;transition:.15s;flex-shrink:0;scroll-snap-align:start;text-decoration:none}
+.tab .ti{font-size:14px;line-height:1}
+.tab:hover{color:var(--text-bright);background:var(--bg-3)}
+.tab.active{color:#fff;background:#050517;border-color:#050517;box-shadow:0 0 14px var(--red-glow)}
+.tabs-arrow{width:34px;height:34px;border-radius:6px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:18px;line-height:1;display:none;flex-shrink:0;transition:.15s;align-items:center;justify-content:center}
+.tabs-arrow:hover{border-color:var(--red);color:var(--red)}
+.tabs-arrow.show{display:flex}
+.tabs-arrow:disabled{opacity:.35;cursor:default}
+.subnav{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.subnav::-webkit-scrollbar{display:none}
+.subnav a{flex-shrink:0;color:var(--text-dim);background:var(--bg-2);border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:600;white-space:nowrap;transition:.15s;cursor:pointer}
+.subnav a:hover{color:var(--text-bright);background:var(--bg-3);border-color:#333}
+.subnav a.active{color:var(--red);background:rgba(224,27,27,.1);border-color:rgba(224,27,27,.5)}
+
+/* ============================================================
+   7. KOTAK KONTEN & FORUM ROW
+   ============================================================ */
+.cat{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
+.cat-head{background:linear-gradient(90deg,rgba(224,27,27,.12),transparent 60%);border-bottom:1px solid var(--border);padding:11px 16px;display:flex;align-items:center;gap:10px}
+.cat-head .icon{width:26px;height:26px;border-radius:6px;background:rgba(224,27,27,.15);border:1px solid rgba(224,27,27,.35);display:grid;place-items:center;font-size:14px;color:var(--red);flex-shrink:0}
+.cat-head h3{font-size:14px;font-weight:700;color:var(--text-bright)}
+.cat-head span{font-size:12px;color:var(--text-dim);margin-left:auto;white-space:nowrap}
+.cat.boxed{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cat.boxed .cat-head{border-bottom:1px solid var(--border);margin-bottom:0}
+
+.forum-row{display:grid;grid-template-columns:44px 1fr 90px 90px 180px;gap:14px;align-items:center;padding:14px 16px;border-bottom:1px solid #161616;transition:.15s;cursor:pointer;text-decoration:none;color:inherit}
+.forum-row:last-child{border-bottom:none}
+.forum-row:hover{background:var(--bg-2)}
+.forum-row:hover .f-icon{border-color:var(--red);color:var(--red)}
+.f-icon{width:40px;height:40px;border-radius:8px;background:var(--bg-2);border:1px solid var(--border);display:grid;place-items:center;font-size:17px;color:var(--text-dim);transition:.15s;flex-shrink:0}
+.f-name{font-weight:700;color:var(--text-bright);font-size:13.5px}
+.f-desc{font-size:12px;color:var(--text-dim);margin-top:2px}
+.f-stat{text-align:center}
+.f-stat .n{font-weight:700;color:var(--text);font-size:13.5px}
+.f-stat .l{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+.last-post{font-size:12px;color:var(--text-dim);text-align:right;line-height:1.4}
+.last-post b{color:var(--text);font-weight:600;display:block}
+
+/* ============================================================
+   8. SLIDER & NAVIGATION PAGINATION
+   ============================================================ */
+.slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.slider::-webkit-scrollbar{display:none}
+.slider > .forum-row{flex:0 0 100%;margin-bottom:0;scroll-snap-align:start;border-radius:0}
+
+.slider-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;padding:0 16px 16px}
+.slider-btn{width:38px;height:38px;border-radius:50%;background:var(--bg-1);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:20px;line-height:1;display:grid;place-items:center;cursor:pointer;transition:.15s;text-decoration:none}
+.slider-btn:hover:not(:disabled){border-color:var(--red);color:var(--red)}
+.slider-btn:disabled{opacity:.35;cursor:default}
+.slider-count{min-width:52px;text-align:center;font-size:12px;font-weight:600;color:var(--text-dim)}
+a.slider-btn{text-decoration:none;color:var(--text)}
+a.slider-btn:hover{color:var(--red);border-color:var(--red)}
+
+/* ============================================================
+   9. SIDEBAR
+   ============================================================ */
+.side-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:18px}
+.side-card h4{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--red);margin-bottom:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.side-card h4 .ico{width:22px;height:22px;border-radius:5px;background:rgba(224,27,27,.12);border:1px solid rgba(224,27,27,.35);display:grid;place-items:center;font-size:12px;flex-shrink:0}
+.thread-mini{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #161616;font-size:12.5px;align-items:center}
+.thread-mini:last-child{border-bottom:none}
+.thread-mini .ti{width:22px;height:22px;border-radius:5px;background:var(--bg-3);border:1px solid var(--border);display:grid;place-items:center;font-size:11px;color:var(--text-dim);flex-shrink:0}
+.thread-mini .n{color:var(--text-bright);font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none}
+.thread-mini a.n:hover{color:var(--red)}
+.thread-mini .t{color:var(--text-dim);font-size:11px;white-space:nowrap}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;flex-shrink:0}
+.tag.red{background:rgba(224,27,27,.15);color:var(--red);border:1px solid rgba(224,27,27,.4)}
+.tag.gray{background:var(--bg-3);color:var(--text-dim)}
+.online-list{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.online-dot{width:28px;height:28px;border-radius:50%;background:var(--bg-3);border:1px solid var(--border);display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--text-dim);position:relative}
+.online-dot::after{content:"";position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;border-radius:50%;background:#22c55e;border:2px solid var(--bg-1)}
+
+/* ============================================================
+   10. FOOTER, DRAWER, MODAL
+   ============================================================ */
+footer{border-top:1px solid var(--border);padding:22px 20px;text-align:center;color:var(--text-dim);font-size:12px;margin-top:10px}
+footer b{color:var(--red)}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:90}
+.drawer-backdrop.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:var(--drawer-w);max-width:85vw;background:var(--bg-1);border-right:1px solid var(--border);box-shadow:6px 0 30px rgba(0,0,0,.7);transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:100;display:none;flex-direction:column;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0b0b0b,#080808);position:sticky;top:0;z-index:2}
+.drawer-header .logo{font-size:17px}
+.drawer-close{width:34px;height:34px;border-radius:6px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);cursor:pointer;display:grid;place-items:center;font-size:18px;line-height:1;transition:.15s}
+.drawer-close:hover{border-color:var(--red);color:var(--red)}
+.drawer-nav{display:flex;flex-direction:column;gap:2px;padding:12px 10px}
+.drawer-nav a{color:var(--text-dim);padding:12px 14px;border-radius:6px;font-weight:600;font-size:14px;transition:.15s;display:flex;align-items:center;gap:10px}
+.drawer-nav a .di{width:22px;height:22px;border-radius:5px;background:var(--bg-3);border:1px solid var(--border);display:grid;place-items:center;font-size:12px;color:var(--text-dim);flex-shrink:0}
+.drawer-nav a:hover{color:var(--text-bright);background:var(--bg-3); text-shadow: 0 0 8px var(--red-glow); padding-left: 18px;}
+.drawer-nav a:hover .di{color:var(--red);border-color:var(--red)}
+.drawer-nav a.active{color:var(--red);background:rgba(224,27,27,.08)}
+.drawer-nav a.active .di{color:var(--red);border-color:rgba(224,27,27,.5);background:rgba(224,27,27,.12)}
+
+/* ============================================================
+   11. FORM, PROFIL, PAGINATION, EMPTY STATE, ALERT
+   ============================================================ */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;margin-bottom:6px;font-size:12px;color:var(--text-dim);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 12px;background:var(--bg-0);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font);font-size:13.5px;transition:.15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 2px rgba(224,27,27,.15)}
+.form-select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);background-position:calc(100% - 18px) calc(50% - 2px),calc(100% - 13px) calc(50% - 2px);background-size:5px 5px, 5px 5px;background-repeat:no-repeat;padding-right:34px;cursor:pointer}
+.form-textarea{resize:vertical;min-height:140px;line-height:1.6}
+.form-actions{margin-top:14px;display:flex;justify-content:flex-end;gap:8px}
+
+/* ============================================================
+   FLASH ALERT (GAYA JUMBOTRON - LEBIH RINGKAS)
+   ============================================================ */
+.alert {
+  position: relative;
+  background: linear-gradient(135deg, var(--bg-1) 0%, #0a0a0a 100%) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 3px solid var(--text-dim) !important; 
+  color: var(--text-bright) !important;
+  padding: 10px 16px !important; 
+  border-radius: var(--radius) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; 
+  font-size: 13px; 
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  margin-bottom: 16px !important; 
+  animation: slideDown 0.4s ease-out;
+  overflow: hidden;
+}
+
+.alert::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.alert::before {
+  content: "📢";
+  font-size: 16px; 
+  line-height: 1;
+  z-index: 2;
+  position: relative;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
+}
+
+.alert span, .alert * {
+  z-index: 2;
+  position: relative;
+}
+
+.alert strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-hero{background:linear-gradient(135deg,#120404 0%,var(--bg-1) 60%);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:var(--radius);padding:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap; margin-bottom: 22px;}
+.profile-left{display:flex;align-items:center;gap:16px}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--red-dark),#3a0606);display:grid;place-items:center;font-weight:800;color:#fff;font-size:24px;border:2px solid var(--red-dark);box-shadow:0 0 20px var(--red-glow);flex-shrink:0}
+.profile-info h1{font-size:22px;color:var(--text-bright);font-weight:800;line-height:1.2;margin-bottom:4px}
+.profile-info h1 b{color:var(--red)}
+.profile-info p{color:var(--text-dim);font-size:13px}
+.profile-right{display:flex;gap:12px}
+.profile-stat-box{background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:10px 20px;text-align:center;min-width:80px}
+.profile-stat-box .num{font-size:20px;font-weight:800;color:var(--red);line-height:1.2}
+.profile-stat-box .lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+
+.pagination{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:16px;border-top:1px solid var(--border)}
+.pagination a,.pagination span{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-2);color:var(--text);font-size:13px;font-weight:600;transition:.15s}
+.pagination a:hover{border-color:var(--red);color:var(--red);background:var(--bg-3)}
+.pagination .active{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 14px var(--red-glow);cursor:default}
+.pagination .disabled{opacity:.35;pointer-events:none}
+
+.empty-state{padding:32px 20px;text-align:center;color:var(--text-dim);font-size:13.5px}
+.empty-state .icon{font-size:36px;margin-bottom:8px;opacity:.6}
+.empty-state .title{color:var(--text-bright);font-weight:700;font-size:14px;margin-bottom:4px}
+
+/* ============================================================
+   12. TAMPILAN PROFIL & DAFTAR ANGGOTA (RAPI)
+   ============================================================ */
+.profile-thread-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #161616;text-decoration:none;color:inherit;transition:background .15s}
+.profile-thread-item:last-child{border-bottom:none}
+.profile-thread-item:hover{background:var(--bg-2)}
+.pti-icon{width:42px;height:42px;border-radius:8px;background:var(--bg-2);border:1px solid var(--border);display:grid;place-items:center;font-size:18px;color:var(--text-dim);flex-shrink:0}
+.pti-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.pti-title{font-weight:700;color:var(--text-bright);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pti-meta{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pti-meta .pti-cat{color:var(--red);font-weight:600}
+.pti-meta .pti-cat:hover{text-decoration:underline}
+.pti-meta .pti-dot{color:var(--border)}
+
+/* Stats di Profil */
+.pti-stats{display:flex;gap:16px;flex-shrink:0;text-align:center;background:var(--bg-2);padding:6px 12px;border-radius:6px;border:1px solid var(--border)}
+.pti-stats .stat-item{display:flex;flex-direction:column;min-width:45px}
+.pti-stats .n{font-weight:700;color:var(--text-bright);font-size:13px;line-height:1.2}
+.pti-stats .l{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+
+/* Khusus Daftar Anggota (Tanpa Kotak Background) */
+.profile-thread-item .pti-stats.no-bg {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  align-items: center;
+}
+.profile-thread-item .pti-stats.no-bg .stat-item {
+  align-items: flex-end; 
+}
+
+/* ============================================================
+   CUSTOM FILE INPUT
+   ============================================================ */
+.custom-file-upload {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none; /* Sembunyikan input bawaan browser */
+}
+
+.custom-file-upload label {
+  margin: 0;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text-bright);
+  transition: 0.15s;
+}
+
+.custom-file-upload label:hover {
+  background: var(--bg-3);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* ============================================================
+   13. PERBAIKAN BARIS THREAD (PROFIL & BERANDA)
+   ============================================================ */
+.profile-thread-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px;
+  padding-right: 12px;
+  border-bottom: 1px solid #161616;
+}
+.profile-thread-wrapper:last-child { border-bottom: none; }
+.profile-thread-wrapper:hover { background: var(--bg-2); }
+
+.profile-thread-wrapper > .profile-thread-item,
+.profile-thread-wrapper > .forum-row {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px;
+  border-bottom: none !important;
+  padding-right: 0;
+}
+
+.profile-thread-wrapper .pti-icon {
+  flex-shrink: 0;
+}
+
+.profile-thread-wrapper .pti-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.profile-thread-wrapper .pti-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.profile-thread-wrapper .pti-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.profile-thread-wrapper .pti-stats {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px !important;
+  flex-shrink: 0;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.btn-delete-thread {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 16px;
+  color: var(--red);
+  background: rgba(224, 27, 27, 0.1);
+  border: 1px solid var(--red);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-delete-thread:hover {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 0 10px var(--red-glow);
+}
+
+/* ============================================================
+   14. MODAL KUSTOM (UNTUK KONFIRMASI HAPUS)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(3px);
+  display: none; 
+  place-items: center;
+  z-index: 999;
+  padding: 20px;
+}
+.modal-overlay.show {
+  display: grid;
+}
+.modal {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 340px;
+  max-width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: modalPop 0.25s ease-out;
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ============================================================
+   15. MEDIA QUERIES (PENGATURAN RESPONSIVE)
+   ============================================================ */
+
+@media (min-width:1400px){
+  .wrap,.topbar{max-width:1320px}
+  .grid-2{grid-template-columns:minmax(0,1fr) 340px;gap:26px}
+  .forum-row{grid-template-columns:48px 1fr 100px 100px 200px}
+  .tabs{overflow-x:hidden;scroll-snap-type:none}
+  .tab{padding:10px 18px;font-size:13.5px}
+  .search-bar input{width:180px}
+  .jumbo-content h1{font-size:38px}
+  .jumbo-stats .num{font-size:26px}
+}
+
+@media (max-width:1024px){
+  .wrap{padding:20px 16px 50px}
+  .grid-2{grid-template-columns:minmax(0,1fr) 260px;gap:18px}
+  .forum-row{grid-template-columns:44px 1fr 80px 80px 150px;gap:12px}
+  .hero{padding:20px 22px}
+  .tabs{overflow-x:auto;scroll-snap-type:x proximity}
+  .tab{padding:8px 13px;font-size:12.5px;gap:6px}
+  .tab .ti{font-size:13px}
+  .search-bar input{width:110px}
+}
+
+@media (max-width:900px){
+  nav.main{display:none}
+  .menu-toggle{display:flex}
+  .grid-2{grid-template-columns:minmax(0,1fr)}
+  .sidebar-desktop{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:4px}
+  .sidebar-desktop .side-card{margin-bottom:0}
+  .sidebar-desktop .side-card:last-child{grid-column:1 / -1}
+  .drawer{display:flex}
+  .forum-row{grid-template-columns:44px 1fr 80px 80px;gap:12px}
+  .last-post{display:none}
+  .hero{flex-direction:column;align-items:flex-start;gap:16px}
+  .tabs-arrow{display:none !important}
+  .tabs{scroll-snap-type:x mandatory}
+  .tab{padding:8px 12px;font-size:12.5px}
+  .search-bar input{width:90px} 
+  .desk-only{display:none !important}
+}
+
+@media (max-width:640px){
+  :root{--header-h:56px;--drawer-w:300px}
+  body{font-size:13.5px}
+  .wrap{padding:16px 12px 40px;gap:16px}
+  
+  .topbar{padding:9px 10px;gap:8px;justify-content:space-between}
+  .logo{font-size:17px; margin-right:0 !important; flex-shrink:0;}
+  .user-area{gap:4px;margin-left:0}
+  .user-area .btn{padding:5px 8px;font-size:11.5px}
+  
+  .search-bar { display: flex; flex: 1; max-width: 140px; margin: 0 4px; padding: 0 6px; height: 30px; }
+  .search-bar .search-icon { font-size: 11px; margin-right: 4px; }
+  .search-bar input { width: 100% !important; font-size: 11.5px; } 
+  .avatar{width:30px;height:30px;font-size:12px}
+  .menu-toggle{width:36px;height:36px}
+
+  /* JUMBOTRON MOBILE */
+  .jumbotron { min-height: 220px; }
+  .jumbo-content h1 { font-size: 23px !important; text-align: center; }
+  .jumbo-content p { font-size: 13px; }
+  .jumbo-stats { gap: 10px; }
+  .jumbo-stats .stat { padding: 8px 12px; min-width: 60px; }
+  .jumbo-stats .num { font-size: 18px; }
+  
+  .hero{padding:16px;text-align:center; margin-bottom:16px;}
+  .hero > div:first-child{width:100%}
+  .hero p{margin-left:auto;margin-right:auto}
+  .hero h1{font-size:18px}
+  .hero p{font-size:12.5px}
+  
+  .nav-container{padding:6px;margin-bottom:16px}
+  .tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;gap:10px !important;scrollbar-width:none;-ms-overflow-style:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:1 0 auto;white-space:nowrap;padding:8px 14px;font-size:12.5px;gap:6px}
+  .tab .ti{font-size:13px}
+  .subnav{margin-top:8px;padding-top:8px;gap:6px}
+  .subnav a{font-size:11.5px;padding:5px 10px}
+
+  /* PERBAIKAN LAYOUT THREAD */
+  .forum-row{grid-template-columns:40px minmax(0, 1fr) !important;gap:10px;padding:12px}
+  .f-stat{display:none}
+  .f-icon{width:36px;height:36px;font-size:15px}
+  .forum-row > div:nth-child(2) { min-width: 0; }
+  
+  .f-name{font-size:13px;}
+  .f-name a { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-bright) !important; }
+  .f-name a:hover { color: var(--red) !important; }
+  .f-desc{font-size:11.5px;line-height:1.4}
+
+  .cat-head{padding:10px 12px}
+  .cat-head h3{font-size:13px}
+  .cat-head span{font-size:11px}
+
+  .sidebar-desktop{display:block;margin-top:0}
+  .sidebar-desktop .side-card{margin-bottom:14px}
+  footer{font-size:11px;padding:18px 12px}
+
+  /* PROFIL & ANGGOTA MOBILE */
+  .profile-hero{flex-direction:column;align-items:flex-start;padding:20px}
+  .profile-right { width: 100%; justify-content: space-between; }
+  .profile-stat-box { flex: 1; }
+  
+  .profile-thread-item { align-items: center !important; padding: 12px 14px; gap: 12px; }
+  .pti-icon { width: 40px !important; height: 40px !important; font-size: 16px !important; margin-top: 0 !important; }
+  .pti-title { font-size: 13.5px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pti-meta { font-size: 11.5px; margin-top: 2px; }
+  
+  .pti-stats { flex-direction: column; gap: 4px; padding: 4px 8px; margin-top: 0; }
+  .pti-stats .stat-item { flex-direction: row; align-items: baseline; gap: 4px; min-width: auto; justify-content: flex-end; }
+  .pti-stats .n { font-size: 13px; }
+  .pti-stats .l { font-size: 10.5px; text-transform: none; letter-spacing: normal; }
+
+  .pagination a,.pagination span{min-width:30px;height:30px;padding:0 8px;font-size:12px}
+  .empty-state { padding: 24px 16px !important; text-align: center; font-size: 12.5px; }
+  
+  .user-area .btn-primary[href="/register"] { display: none; }
+}
+
+@media (max-width:380px){
+  :root{--drawer-w:260px}
+  .logo{font-size:14px}
+  .topbar { gap: 4px !important; }
+  .user-area{gap:3px}
+  .user-area .btn{padding:4px 6px;font-size:10.5px}
+  
+  .search-bar { padding: 0 4px; height: 28px; max-width: 100px; }
+  .search-bar .search-icon { display: none; } 
+  .search-bar input { font-size: 11px; }
+  
+  .hero h1{font-size:16px}
+  .tabs{gap:8px !important}
+  .tab{padding:7px 12px;font-size:11.5px}
+  .forum-row{grid-template-columns:34px minmax(0, 1fr) !important;gap:8px;padding:10px}
+  .f-icon{width:32px;height:32px;font-size:13px}
+  .thread-mini .tag{display:none}
+}
+
+/* ============================================================
+   16. RAIDFORUMS THREAD STYLE (SIDEBAR KIRI & HEADER BIRU)
+   ============================================================ */
+
+/* Breadcrumb */
+.rf-breadcrumb {
+  background: #1e1e1e;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+}
+.rf-breadcrumb a { color: #ddd; text-decoration: none; }
+.rf-breadcrumb a:hover { color: #4da6ff; }
+.rf-breadcrumb span { margin: 0 8px; color: #666; }
+
+/* Header Thread */
+.rf-thread-header {
+  background: #1f2c38; 
+  border: 1px solid #2d3d4f;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.rf-tag {
+  background: #e0a800; 
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.rf-thread-header h1 {
+  display: inline;
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+.rf-thread-header p {
+  font-size: 12px;
+  color: #8ea3b7;
+  margin-top: 6px;
+}
+.rf-author-link {
+  color: #4da6ff;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* Container Postingan */
+.rf-post-container {
+  display: flex;
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+/* Sidebar Kiri (User Info) */
+.rf-post-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: #1e1e1e;
+  border-right: 1px solid #2a2a2a;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rf-user-block {
+  width: 100%;
+  text-align: center;
+}
+
+.rf-username {
+  color: #00bfff; 
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.rf-avatar-large {
+  width: 100px;
+  height: 100px;
+  background: #000;
+  border: 1px solid #333;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.rf-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.rf-initial {
+  font-size: 36px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.rf-user-rank {
+  font-size: 12px;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+.rf-member-badge {
+  background: #0a0a0a;
+  border: 2px solid #4da6ff;
+  padding: 2px;
+  width: 90%;
+  margin: 0 auto 12px;
+}
+.rf-badge-inner {
+  background: #1a1a1a;
+  color: #4da6ff;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  padding: 4px;
+  letter-spacing: 2px;
+}
+
+.rf-user-stats {
+  width: 100%;
+  font-size: 11px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+.rf-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  color: #999;
+}
+.rf-stat-row .rf-val { color: #fff; font-weight: bold; }
+
+.rf-service-badge {
+  background: #1f2c38;
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+  padding: 4px;
+  width: 100%;
+  border-radius: 2px;
+  border: 1px solid #2d3d4f;
+}
+
+/* Konten Postingan */
+.rf-post-content {
+  flex: 1;
+  padding: 20px;
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.rf-post-date {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #222;
+  padding-bottom: 8px;
+}
+
+.rf-message-body {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.rf-message-body a {
+  color: #4da6ff;
+  text-decoration: underline;
+}
+
+/* Kotak Balasan */
+.rf-replies-container {
+  margin-top: 20px;
+}
+.rf-replies-header {
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  padding: 10px 16px;
+  font-weight: bold;
+  color: #ccc;
+  font-size: 13px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* Form Balasan */
+.rf-reply-box {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  padding: 20px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.rf-reply-box h3 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+.rf-textarea {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+.rf-textarea:focus {
+  outline: none;
+  border-color: #4da6ff;
+}
+.rf-btn-submit {
+  background: #1f2c38;
+  color: #fff;
+  border: 1px solid #2d3d4f;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.rf-btn-submit:hover {
+  background: #2d3d4f;
+  border-color: #4da6ff;
+}
+
+/* Responsive HP */
+@media (max-width: 640px) {
+  .rf-post-container { flex-direction: column; }
+  .rf-post-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #2a2a2a;
+    flex-direction: row;
+    text-align: left;
+    gap: 16px;
+    padding: 12px;
+  }
+  .rf-user-block { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; text-align: left; }
+  .rf-avatar-large { width: 60px; height: 60px; margin: 0; }
+  .rf-user-stats, .rf-member-badge, .rf-service-badge { display: none; } 
+  .rf-username { margin-bottom: 0; width: 100%; }
+  .rf-post-content { padding: 16px; }
+}
+
+/* ============================================================
+   KARTU KATEGORI DI BERANDA (lebih jelas dan rapi)
+   ============================================================ */
+.cat.boxed {
+  border-left: 3px solid var(--red);
+  margin-bottom: 18px;
+}
+
+.cat-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.cat-head h3 {
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+.cat-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* Baris thread */
+.profile-thread-wrapper {
+  padding: 12px 16px;
+  border-bottom: 1px solid #161616;
+}
+.profile-thread-wrapper:last-child {
+  border-bottom: none;
+}
+.profile-thread-wrapper .f-name a {
+  font-weight: 600;
+  color: var(--text-bright);
+  font-size: 15px;
+  line-height: 1.35;
+}
+.profile-thread-wrapper .f-name a:hover {
+  color: var(--red);
+}
+.profile-thread-wrapper .f-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 3px;
+}
+.profile-thread-wrapper .f-stat .n {
+  font-size: 15px;
+}
+.profile-thread-wrapper .f-stat .l {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Pagination kecil di tengah */
+.slider-nav {
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+.slider-btn {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+.slider-count {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 48px;
+  text-align: center;
+}
+
+/* Tautan "View all" sebagai tombol kecil */
+.view-all {
+  display: block;
+  margin: 12px 16px 14px;
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: 6px;
+  background: rgba(224, 27, 27, 0.08);
+}
+.view-all:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+/* Kategori kosong: satu baris, tetap rapi */
+.cat-link {
+  border-left: 3px solid var(--border);
+}
+.cat-link:hover {
+  border-left-color: var(--red);
+}
+
+@media print{
+  header,footer,.drawer,.drawer-backdrop,.menu-toggle,.user-area,.modal-overlay,.nav-container{display:none!important}
+  body{background:#fff;color:#000}
+  .cat,.hero{border-color:#ccc}
+}

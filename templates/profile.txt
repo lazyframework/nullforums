@@ -1,0 +1,129 @@
+<?php use NF\{Security, Csrf}; ?>
+
+<!-- KARTU PROFIL ATAS -->
+<section class="profile-hero">
+  <div class="profile-left">
+    <!-- Avatar -->
+    <div class="profile-avatar" style="background: transparent; border: none; overflow: hidden; padding: 0;">
+      <?php if (!empty($profileUser['avatar_path'])): ?>
+        <img src="<?= Security::e($profileUser['avatar_path']) ?>" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+      <?php else: ?>
+        <div style="width: 100%; height: 100%; display: grid; place-items: center; background: linear-gradient(135deg, var(--red-dark), #3a0606); color: #fff; font-size: 24px; font-weight: 800;">
+          <?= Security::e($profileUser['avatar_initial'] ?? strtoupper(substr($profileUser['username'], 0, 1))) ?>
+        </div>
+      <?php endif; ?>
+    </div>
+    
+    <!-- Info User -->
+    <div class="profile-info">
+      <h1><b><?= Security::e($profileUser['username']) ?></b></h1>
+      <p>Join# <?= Security::e(relative_time($profileUser['created_at'])) ?></p>
+      <?php if ($profileUser['role'] !== 'user'): ?>
+        <div style="margin-top: 6px;">
+          <span class="tag red"><?= Security::e(ucfirst($profileUser['role'])) ?></span>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+  
+  <!-- Statistik -->
+  <div class="profile-right">
+    <div class="profile-stat-box">
+      <div class="num"><?= (int)$profileUser['thread_count'] ?></div>
+      <div class="lbl">Thread</div>
+    </div>
+    <div class="profile-stat-box">
+      <div class="num"><?= (int)$profileUser['post_count'] ?></div>
+      <div class="lbl">Balasan</div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM UPLOAD AVATAR (Hanya muncul jika melihat profil sendiri) -->
+<?php if (!empty($user) && $user['id'] === $profileUser['id']): ?>
+  <div class="cat boxed" style="padding: 16px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <h3 style="font-size: 14px; margin-bottom: 2px;">Change Profile Picture</h3>
+      <p style="font-size: 12px; color: var(--text-dim);">Max. 2MB (JPG, PNG, WEBP)</p>
+    </div>
+    <form method="post" action="/u/avatar" enctype="multipart/form-data" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <?= Csrf::field() ?>
+      
+      <!-- Menggunakan custom file input agar teks "No file chosen" hilang -->
+      <div class="custom-file-upload">
+        <input type="file" name="avatar" id="avatarInput" accept="image/jpeg, image/png, image/webp" required onchange="document.getElementById('fileName').textContent = this.files[0].name">
+        <label for="avatarInput" class="btn" style="padding: 6px 12px; font-size: 12px; cursor: pointer;">
+          <i class="ti ti-upload"></i> Choose File
+        </label>
+        <span id="fileName" style="font-size: 12px; color: var(--text-dim); margin-left: 8px;">No file chosen</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Upload</button>
+    </form>
+  </div>
+<?php endif; ?>
+
+<!-- DAFTAR THREAD USER -->
+<div class="cat boxed">
+  <div class="cat-head">
+    <div class="icon">🧵</div>
+    <h3>Thread oleh <?= Security::e($profileUser['username']) ?></h3>
+    <span><?= (int)$totalThreads ?> Thread</span>
+  </div>
+
+  <?php if (!$threads): ?>
+    <div class="empty-state">
+      <div class="icon">📭</div>
+      <div class="title">Belum ada thread</div>
+      <div>User ini belum pernah membuat thread.</div>
+    </div>
+  <?php endif; ?>
+
+  <?php 
+  // Cek apakah user yang login berhak menghapus thread ini
+  $canDeleteAny = !empty($user) && (in_array($user['role'], ['admin', 'mod'], true) || $user['id'] === $profileUser['id']);
+  ?>
+
+  <?php foreach ($threads as $t): ?>
+    <!-- BUNGKUS DENGAN DIV AGAR TOMBOL HAPUS BISA DI SAMPING -->
+    <div class="profile-thread-wrapper" id="thread-<?= $t['id'] ?>">
+      <a class="profile-thread-item" href="/t/<?= Security::e($t['slug']) ?>">
+        <div class="pti-icon"><?= Security::e($t['forum_icon']) ?></div>
+        <div class="pti-body">
+          <div class="pti-title"><?= Security::e($t['title']) ?></div>
+          <div class="pti-meta">
+            <a href="/<?= Security::e($t['cat_slug']) ?>" class="pti-cat"><?= Security::e($t['cat_name']) ?></a>
+            <span class="pti-dot">&middot;</span>
+            <span class="pti-forum"><?= Security::e($t['forum_name']) ?></span>
+            <span class="pti-dot">&middot;</span>
+            <span class="pti-time"><?= Security::e(relative_time($t['created_at'])) ?></span>
+          </div>
+        </div>
+        <div class="pti-stats">
+          <div class="stat-item"><span class="n"><?= (int)$t['reply_count'] ?></span><span class="l">Balasan</span></div>
+          <div class="stat-item"><span class="n"><?= number_format((int)$t['views'], 0, ',', '.') ?></span><span class="l">Dilihat</span></div>
+        </div>
+      </a>
+      
+      <!-- TOMBOL HAPUS (Hanya Muncul Jika Berhak) -->
+      <?php if ($canDeleteAny): ?>
+        <button class="btn btn-delete-thread" data-id="<?= $t['id'] ?>" title="Hapus Thread">
+          <i class="ti ti-trash"></i>
+        </button>
+      <?php endif; ?>
+    </div>
+  <?php endforeach; ?>
+
+  <?php
+  $perPage   = 20;
+  $totalPage = (int)ceil($totalThreads / $perPage);
+  if ($totalPage > 1):
+  ?>
+    <div class="pagination">
+      <?php for ($i = 1; $i <= $totalPage; $i++): ?>
+        <a class="<?= $i === $page ? 'active' : '' ?>"
+           href="/u/<?= Security::e($profileUser['username']) ?>?page=<?= $i ?>"><?= $i ?></a>
+      <?php endfor; ?>
+    </div>
+  <?php endif; ?>
+</div>

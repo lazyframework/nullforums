@@ -1,0 +1,126 @@
+<?php
+use NF\{Category, Database, Security};
+
+$allCats = Category::all();
+
+$g = Database::q(
+    'SELECT
+       (SELECT COUNT(*) FROM users WHERE is_active = 1)      AS members,
+       (SELECT COUNT(*) FROM threads WHERE is_deleted = 0)   AS threads,
+       (SELECT COUNT(*) FROM posts WHERE is_deleted = 0)     AS posts,
+       (SELECT COUNT(*) FROM sessions
+         WHERE last_activity > (UNIX_TIMESTAMP() - 900))     AS online'
+)->fetch();
+
+$limit = 3; // jumlah thread per kategori di beranda
+?>
+
+<!-- JUMBOTRON -->
+<section class="jumbotron">
+  <div class="jumbo-bg" style="background-image: url('/img/banner.jpg');"></div>
+
+  <div class="jumbo-content">
+    <h1>NullForums // <b>Cyber Operations</b></h1>
+    <p>The underground network for data leaks, system exploitation, and digital freedom.</p>
+
+    <div class="jumbo-stats">
+      <div class="stat">
+        <div class="num"><?= number_format((int)$g['members'], 0, ',', '.') ?></div>
+        <div class="lbl">Members</div>
+      </div>
+      <div class="stat">
+        <div class="num"><?= number_format((int)$g['threads'], 0, ',', '.') ?></div>
+        <div class="lbl">Threads</div>
+      </div>
+      <div class="stat">
+        <div class="num"><?= number_format((int)$g['posts'], 0, ',', '.') ?></div>
+        <div class="lbl">Posts</div>
+      </div>
+      <div class="stat">
+        <div class="num"><?= (int)$g['online'] ?></div>
+        <div class="lbl">Online</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php foreach ($allCats as $c):
+    if ($c['slug'] === 'general') continue;
+
+    $catId = (int)$c['id'];
+
+    $totalThreads = (int)Database::q(
+        'SELECT COUNT(*) FROM threads t
+           JOIN forums f ON f.id = t.forum_id
+          WHERE f.category_id = ? AND t.is_deleted = 0',
+        [$catId]
+    )->fetchColumn();
+?>
+
+<?php if ($totalThreads === 0): ?>
+  <!-- Kategori kosong: satu baris saja -->
+  <a class="cat boxed cat-link" href="/<?= Security::e($c['slug']) ?>">
+    <span class="cat-link-icon"><?= Security::icon($c['icon']) ?></span>
+    <span class="cat-link-name"><?= Security::e($c['name']) ?></span>
+    <span class="cat-link-count">0 threads</span>
+  </a>
+
+<?php else:
+    $threads = Database::q(
+        'SELECT t.id, t.user_id, t.title, t.slug, t.reply_count, t.views, t.last_post_at,
+                f.name AS forum_name, f.icon, u.username
+           FROM threads t
+           JOIN forums f ON f.id = t.forum_id
+           JOIN users  u ON u.id = t.user_id
+          WHERE f.category_id = ? AND t.is_deleted = 0
+       ORDER BY t.last_post_at DESC
+          LIMIT ' . $limit,
+        [$catId]
+    )->fetchAll();
+?>
+  <div class="cat boxed">
+    <div class="cat-head">
+      <div class="icon"><?= Security::icon($c['icon']) ?></div>
+      <h3><?= Security::e($c['name']) ?></h3>
+      <span class="cat-count"><?= $totalThreads ?> Threads</span>
+    </div>
+
+    <div class="thread-list">
+      <?php foreach ($threads as $t):
+          $canDeleteHome = !empty($user) && (
+              in_array($user['role'], ['admin', 'mod'], true)
+              || (int)$user['id'] === (int)$t['user_id']
+          );
+      ?>
+        <div class="profile-thread-wrapper" id="thread-<?= (int)$t['id'] ?>">
+          <div class="forum-row">
+            <div class="f-icon"><?= Security::icon($t['icon']) ?></div>
+            <div>
+              <div class="f-name">
+                <a href="/t/<?= Security::e($t['slug']) ?>"><?= Security::e($t['title']) ?></a>
+              </div>
+              <div class="f-desc"><?= Security::e($t['forum_name']) ?> &middot; by <?= Security::e($t['username']) ?></div>
+            </div>
+            <div class="f-stat"><div class="n"><?= (int)$t['reply_count'] ?></div><div class="l">Replies</div></div>
+            <div class="f-stat"><div class="n"><?= (int)$t['views'] ?></div><div class="l">Views</div></div>
+            <div class="last-post">
+              <b><?= Security::e(relative_time($t['last_post_at'])) ?></b>
+            </div>
+          </div>
+
+          <?php if ($canDeleteHome): ?>
+            <button type="button" class="btn-delete-thread" data-id="<?= (int)$t['id'] ?>" title="Delete Thread" aria-label="Delete Thread">
+              <i class="ti ti-trash"></i>
+            </button>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
+    </div>
+
+    <?php if ($totalThreads > $limit): ?>
+      <a class="view-all" href="/<?= Security::e($c['slug']) ?>">View all <?= $totalThreads ?> threads →</a>
+    <?php endif; ?>
+  </div>
+<?php endif; ?>
+
+<?php endforeach; ?>

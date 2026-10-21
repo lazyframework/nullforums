@@ -1,0 +1,116 @@
+<?php
+use NF\{Category, Database, Security};
+
+$isHome    = ($tpl === 'home');
+$isCatPage = ($tpl === 'category');
+$isThread  = ($tpl === 'thread'); 
+
+// Jika sedang di halaman buat thread, jangan tampilkan sidebar apa pun
+if ($tpl === 'new_thread') return;
+
+if ($isHome):
+    $latest = Category::latestThreads(5);
+    $online = Category::onlineUsers(15, 7);
+?>
+  <!-- SIDEBAR BERANDA -->
+  <div class="side-card">
+    <h4><span class="ico">🔥</span> Thread Terbaru</h4>
+    <?php foreach ($latest as $t): ?>
+      <div class="thread-mini">
+        <span class="ti"><?= Security::icon($t['icon']) ?></span>
+        <span class="tag gray"><?= Security::e(ucfirst($t['cat_slug'])) ?></span>
+        <a class="n" href="/t/<?= Security::e($t['slug']) ?>"><?= Security::e($t['title']) ?></a>
+        <span class="t"><?= Security::e(relative_time($t['last_post_at'])) ?></span>
+      </div>
+    <?php endforeach; ?>
+    <?php if (!$latest): ?>
+      <div class="thread-mini"><span class="n">Belum ada thread</span></div>
+    <?php endif; ?>
+  </div>
+
+  <div class="side-card">
+    <h4><span class="ico">🟢</span> Sedang Online</h4>
+    <div class="online-list">
+      <?php foreach ($online as $o): ?>
+        <div class="online-dot" title="<?= Security::e($o['username']) ?>">
+          <?= Security::e($o['avatar_initial'] ?? strtoupper(substr($o['username'], 0, 1))) ?>
+        </div>
+      <?php endforeach; ?>
+      <?php if (count($online) === 0): ?>
+        <span style="color:var(--text-dim);font-size:12px">Tidak ada yang online</span>
+      <?php endif; ?>
+    </div>
+  </div>
+
+<?php elseif ($isCatPage):
+    $topThreads = Database::q(
+        'SELECT t.title, t.slug, t.reply_count, f.icon
+           FROM threads t
+           JOIN forums f ON f.id = t.forum_id
+          WHERE f.category_id = ? AND t.is_deleted = 0
+       ORDER BY t.reply_count DESC, t.views DESC
+          LIMIT 5',
+        [(int)$cat['id']]
+    )->fetchAll();
+?>
+  <!-- SIDEBAR KATEGORI -->
+  <div class="side-card">
+    <h4><span class="ico">🏆</span> Paling Banyak Dibalas</h4>
+    <?php foreach ($topThreads as $t): ?>
+      <div class="thread-mini">
+        <span class="ti"><?= Security::icon($t['icon']) ?></span>
+        <a class="n" href="/t/<?= Security::e($t['slug']) ?>"><?= Security::e($t['title']) ?></a>
+        <span class="t"><?= (int)$t['reply_count'] ?></span>
+      </div>
+    <?php endforeach; ?>
+    <?php if (!$topThreads): ?>
+      <div class="thread-mini"><span class="n">Belum ada thread</span></div>
+    <?php endif; ?>
+  </div>
+
+<?php elseif ($isThread): ?>
+  <!-- SIDEBAR THREAD INFO -->
+  <div class="side-card">
+    <h4><span class="ico">ℹ️</span> Thread Info</h4>
+    <div class="stat-line">
+      <span class="si">📅</span>
+      <span class="n">Created</span>
+      <span class="t"><?= Security::e(relative_time($thread['created_at'])) ?></span>
+    </div>
+    <div class="stat-line">
+      <span class="si">👁️</span>
+      <span class="n">Views</span>
+      <span class="t"><?= number_format((int)$thread['views'], 0, ',', '.') ?>x</span>
+    </div>
+    <div class="stat-line">
+      <span class="si">💬</span>
+      <span class="n">Replies</span>
+      <span class="t"><?= (int)$thread['reply_count'] ?></span>
+    </div>
+  </div>
+
+  <!-- SIDEBAR THREAD AUTHOR (PEMBUAT THREAD) -->
+  <div class="side-card">
+    <h4><span class="ico">👤</span> Thread Author</h4>
+    <div style="text-align: center; padding: 10px 0;">
+      
+      <!-- AVATAR PEMBUAT THREAD -->
+      <div class="avatar" style="width: 64px; height: 64px; font-size: 24px; margin: 0 auto 10px; overflow: hidden; padding: 0;">
+        <?php if (!empty($thread['avatar_path'])): ?>
+          <img src="<?= Security::e($thread['avatar_path']) ?>" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        <?php else: ?>
+          <?= Security::e($thread['avatar_initial'] ?? strtoupper(substr($thread['username'], 0, 1))) ?>
+        <?php endif; ?>
+      </div>
+      
+      <!-- NAMA PEMBUAT THREAD -->
+      <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--text-bright); margin-bottom: 4px;">
+        <a href="/u/<?= Security::e($thread['username']) ?>" style="color: inherit;"><?= Security::e($thread['username']) ?></a>
+      </h3>
+      
+      <!-- TOMBOL PROFIL -->
+      <a href="/u/<?= Security::e($thread['username']) ?>" class="btn" style="width: 100%; font-size: 12px; margin-top: 8px;">View Profile</a>
+    </div>
+  </div>
+
+<?php endif; ?>

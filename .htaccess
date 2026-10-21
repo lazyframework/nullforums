@@ -1,0 +1,13 @@
+Options -Indexes
+
+<FilesMatch "\.(env|sql|md|json|lock|log)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(config|src|templates|storage|sql)/ - [F,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ public/index.php [L]
+</IfModule>
