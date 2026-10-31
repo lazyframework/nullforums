@@ -24,11 +24,15 @@ namespace StarterAssets
         public bool cursorLocked = true;
         public bool cursorInputForLook = true;
 
+        // --- INI VARIABEL YANG SEMPAT HILANG ---
+        public bool lookFromTouch; 
+        // ---------------------------------------
+
         // ==========================================
         // TAMBAHAN UNTUK JOYSTICK
         // ==========================================
         [Header("Mobile Joystick")]
-        public Joystick moveJoystick; // <-- Menggunakan class 'Joystick' agar lebih aman
+        public FixedJoystick moveJoystick; // Menggunakan FixedJoystick
         // ==========================================
 
 #if ENABLE_INPUT_SYSTEM 
