@@ -1,85 +1,33 @@
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM 
-using UnityEngine.InputSystem;
-#endif
+using StarterAssets; // Wajib ada agar bisa akses script StarterAssetsInputs
 
-/* Note: animations are called via the controller for both the character and capsule using animator null checks
- */
-
-namespace StarterAssets
+public class JoystickToPlayer : MonoBehaviour
 {
-    [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM 
-    [RequireComponent(typeof(PlayerInput))]
-#endif
-    public class StarterAssetsInputs : MonoBehaviour
+    [Header("Hubungkan Joystick Disini")]
+    public FixedJoystick joystick;
+
+    // Variabel untuk menyimpan komponen StarterAssetsInputs di player ini
+    private StarterAssetsInputs playerInputs;
+
+    void Start()
     {
-        [Header("Character Input Values")]
-        public Vector2 move;
-        public Vector2 look;
-        public bool jump;
-        public bool sprint;
-
-        [Header("Movement Settings")]
-        public bool analogMovement;
-
-        [Header("Mouse Cursor Settings")]
-        public bool cursorLocked = true;
-        public bool cursorInputForLook = true;
-
-#if ENABLE_INPUT_SYSTEM 
-        public void OnMove(InputValue value)
+        // Otomatis mencari komponen StarterAssetsInputs di objek ini (Player)
+        playerInputs = GetComponent<StarterAssetsInputs>();
+        
+        if (playerInputs == null)
         {
-            MoveInput(value.Get<Vector2>());
+            Debug.LogError("Script StarterAssetsInputs tidak ditemukan di objek ini!");
         }
+    }
 
-        public void OnLook(InputValue value)
+    void Update()
+    {
+        // Jika joystick sudah dimasukkan dan komponen player ada
+        if (joystick != null && playerInputs != null)
         {
-            if(cursorInputForLook)
-            {
-                LookInput(value.Get<Vector2>());
-            }
-        }
-
-        public void OnJump(InputValue value)
-        {
-            JumpInput(value.isPressed);
-        }
-
-        public void OnSprint(InputValue value)
-        {
-            SprintInput(value.isPressed);
-        }
-#endif
-
-        public void MoveInput(Vector2 newMoveDirection)
-        {
-            move = newMoveDirection;
-        } 
-
-        public void LookInput(Vector2 newLookDirection)
-        {
-            look = newLookDirection;
-        }
-
-        public void JumpInput(bool newJumpState)
-        {
-            jump = newJumpState;
-        }
-
-        public void SprintInput(bool newSprintState)
-        {
-            sprint = newSprintState;
-        }
-
-        private void OnApplicationFocus(bool hasFocus)
-        {
-            SetCursorState(cursorLocked);
-        }
-
-        private void SetCursorState(bool newState)
-        {
-            Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+            // Baca nilai joystick dan kirim ke pergerakan player
+            Vector2 input = new Vector2(joystick.Horizontal, joystick.Vertical);
+            playerInputs.MoveInput(input);
         }
     }
 }
