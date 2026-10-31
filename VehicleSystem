@@ -1,5 +1,6 @@
 using UnityEngine;
 using StarterAssets;
+using UnityEngine.InputSystem; // Wajib ditambahkan untuk Input System baru
 
 public class VehicleSystem : MonoBehaviour
 {
@@ -32,11 +33,14 @@ public class VehicleSystem : MonoBehaviour
 
         float distance = Vector3.Distance(player.transform.position, car.transform.position);
 
-        if (distance <= 4f && !isInCar && Input.GetKeyDown(KeyCode.E))
+        // MENGGUNAKAN INPUT SYSTEM BARU UNTUK TOMBOL E
+        bool pressE = Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
+
+        if (distance <= 4f && !isInCar && pressE)
         {
             EnterCar();
         }
-        else if (isInCar && Input.GetKeyDown(KeyCode.E))
+        else if (isInCar && pressE)
         {
             ExitCar();
         }
