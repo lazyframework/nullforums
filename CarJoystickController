@@ -9,16 +9,16 @@ public class CarJoystickController : MonoBehaviour
     [Header("Car Settings")]
     public float moveSpeed = 15f;    
     public float turnSpeed = 100f;   
-    public float wheelSpinSpeed = 200f; // Kecepatan putar roda
+    public float wheelSpinSpeed = 300f; // Kecepatan putar roda
 
-    [Header("Wheels (Masukkan Roda ke Sini)")]
+    [Header("Wheels (Tarik Roda ke Sini)")]
     public Transform frontLeftWheel;
     public Transform frontRightWheel;
     public Transform rearLeftWheel;
     public Transform rearRightWheel;
 
     private Rigidbody rb;
-    private float currentMoveInput; // Menyimpan nilai maju/mundur untuk roda
+    private float currentMoveInput;
 
     void Start()
     {
@@ -30,7 +30,7 @@ public class CarJoystickController : MonoBehaviour
         float moveInput = 0f;
         float turnInput = 0f;
 
-        // Baca Input Keyboard/Joystick
+        // Baca Input (Joystick / Keyboard)
         if (joystick != null && (joystick.Horizontal != 0 || joystick.Vertical != 0))
         {
             moveInput = joystick.Vertical;
@@ -40,26 +40,27 @@ public class CarJoystickController : MonoBehaviour
         {
             if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveInput = 1f;
             if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) moveInput = -1f;
+            
             if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) turnInput = -1f;
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) turnInput = 1f;
         }
 
         currentMoveInput = moveInput;
 
-        // Gerakkan Mobil
-        Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
-        rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
+        // --- PERGERAKAN MOBIL (ANTI TERBANG) ---
+        // Kita menggunakan MovePosition, bukan linearVelocity, agar mobil tidak mental/terbang saat menabrak
+        Vector3 moveOffset = transform.forward * moveInput * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + moveOffset);
 
-        // Belokkan Mobil
+        // --- BELOK MOBIL ---
         if (Mathf.Abs(moveInput) > 0.1f)
         {
             Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
             rb.MoveRotation(rb.rotation * turnRotation);
         }
 
-        // --- LOGIKA MEMUTAR BAN ---
-        // Memutar ban sesuai kecepatan mobil (maju muter ke depan, mundur muter ke belakang)
-        if (currentMoveInput != 0)
+        // --- RODA BERPUTAR ---
+        if (Mathf.Abs(currentMoveInput) > 0.01f)
         {
             float rotationAmount = currentMoveInput * wheelSpinSpeed * Time.fixedDeltaTime;
             
