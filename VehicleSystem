@@ -3,8 +3,9 @@ using StarterAssets;
 
 public class VehicleSystem : MonoBehaviour
 {
-    public GameObject player; 
-    public GameObject car;    
+    [Header("Referensi")]
+    public GameObject player;      
+    public GameObject car;         
     public Transform seatPosition; 
 
     private bool isInCar = false;
@@ -13,23 +14,28 @@ public class VehicleSystem : MonoBehaviour
 
     void Start()
     {
-        playerController = player.GetComponent<ThirdPersonController>();
-        charController = player.GetComponent<CharacterController>();
+        if (player != null)
+        {
+            playerController = player.GetComponent<ThirdPersonController>();
+            charController = player.GetComponent<CharacterController>();
+        }
         
-        // Matikan script nyetir di awal karena player belum masuk mobil
-        car.GetComponent<CarJoystickController>().enabled = false;
+        if (car.GetComponent<CarJoystickController>() != null)
+        {
+            car.GetComponent<CarJoystickController>().enabled = false;
+        }
     }
 
     void Update()
     {
+        if (player == null || car == null) return;
+
         float distance = Vector3.Distance(player.transform.position, car.transform.position);
 
-        // Jika dekat mobil dan belum masuk, tekan E untuk masuk
         if (distance <= 4f && !isInCar && Input.GetKeyDown(KeyCode.E))
         {
             EnterCar();
         }
-        // Jika sedang di dalam mobil, tekan E untuk keluar
         else if (isInCar && Input.GetKeyDown(KeyCode.E))
         {
             ExitCar();
@@ -40,15 +46,12 @@ public class VehicleSystem : MonoBehaviour
     {
         isInCar = true;
         
-        // 1. Matikan karakter jalan
         playerController.enabled = false;
         charController.enabled = false; 
         
-        // 2. Pindahkan karakter ke kursi mobil
         player.transform.SetParent(car.transform); 
         player.transform.position = seatPosition.position;
         
-        // 3. Nyalakan script nyetir
         car.GetComponent<CarJoystickController>().enabled = true;
     }
 
@@ -56,15 +59,12 @@ public class VehicleSystem : MonoBehaviour
     {
         isInCar = false;
         
-        // 1. Lepas karakter dari mobil, taruh di samping kiri
         player.transform.SetParent(null);
         player.transform.position = car.transform.position + (car.transform.right * -2f) + (Vector3.up * 1f);
         
-        // 2. Nyalakan karakter jalan lagi
         playerController.enabled = true;
         charController.enabled = true;
         
-        // 3. Matikan script nyetir mobil
         car.GetComponent<CarJoystickController>().enabled = false;
     }
 }
