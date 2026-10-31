@@ -1,0 +1,82 @@
+using UnityEngine;
+using StarterAssets;
+using UnityEngine.InputSystem;
+
+public class VehicleSystem : MonoBehaviour
+{
+    [Header("Referensi")]
+    public GameObject player;      
+    public GameObject car;         
+    public Transform seatPosition; 
+    
+    [Header("Referensi Kamera")]
+    public GameObject playerCamera; // Tarik MainCamera (atau PlayerFollowCamera) ke sini
+    public GameObject carCamera;    // Tarik CarCamera ke sini
+
+    private bool isInCar = false;
+    private ThirdPersonController playerController;
+    private CharacterController charController;
+
+    void Start()
+    {
+        if (player != null)
+        {
+            playerController = player.GetComponent<ThirdPersonController>();
+            charController = player.GetComponent<CharacterController>();
+        }
+        
+        if (car.GetComponent<CarJoystickController>() != null)
+        {
+            car.GetComponent<CarJoystickController>().enabled = false;
+        }
+        
+        carCamera.SetActive(false); // Pastikan kamera mobil mati di awal
+    }
+
+    void Update()
+    {
+        if (player == null || car == null) return;
+
+        float distance = Vector3.Distance(player.transform.position, car.transform.position);
+        bool pressE = Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
+
+        if (distance <= 4f && !isInCar && pressE)
+        {
+            EnterCar();
+        }
+        else if (isInCar && pressE)
+        {
+            ExitCar();
+        }
+    }
+
+    void EnterCar()
+    {
+        isInCar = true;
+        playerController.enabled = false;
+        charController.enabled = false; 
+        player.transform.SetParent(car.transform); 
+        player.transform.position = seatPosition.position;
+        
+        car.GetComponent<CarJoystickController>().enabled = true;
+        
+        // TUKAR KAMERA
+        playerCamera.SetActive(false);
+        carCamera.SetActive(true);
+    }
+
+    void ExitCar()
+    {
+        isInCar = false;
+        player.transform.SetParent(null);
+        player.transform.position = car.transform.position + (car.transform.right * -2f) + (Vector3.up * 1f);
+        
+        playerController.enabled = true;
+        charController.enabled = true;
+        car.GetComponent<CarJoystickController>().enabled = false;
+        
+        // TUKAR KAMERA KEMBALI
+        playerCamera.SetActive(true);
+        carCamera.SetActive(false);
+    }
+}
