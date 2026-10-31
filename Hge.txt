@@ -1,0 +1,99 @@
+
+using UnityEngine;
+
+public class VehicleEnterExit : MonoBehaviour
+{
+    [Header("Player")]
+    public Transform playerRoot;
+    public Behaviour[] playerControls;
+
+    [Header("Car")]
+    public Transform seatPosition;
+    public Transform exitPosition;
+
+    [Header("Settings")]
+    public float interactionDistance = 3f;
+
+    private bool isInsideCar = false;
+
+    void Update()
+    {
+        if (playerRoot == null || seatPosition == null)
+            return;
+
+        // Tombol E untuk PC
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (isInsideCar)
+            {
+                ExitCar();
+            }
+            else
+            {
+                float distance = Vector3.Distance(
+                    playerRoot.position,
+                    seatPosition.position
+                );
+
+                if (distance <= interactionDistance)
+                {
+                    EnterCar();
+                }
+            }
+        }
+    }
+
+    public void ToggleVehicle()
+    {
+        if (isInsideCar)
+            ExitCar();
+        else if (playerRoot != null && seatPosition != null)
+        {
+            if (Vector3.Distance(playerRoot.position,
+                seatPosition.position) <= interactionDistance)
+                EnterCar();
+        }
+    }
+
+    public void EnterCar()
+    {
+        if (isInsideCar) return;
+
+        foreach (Behaviour control in playerControls)
+        {
+            if (control != null)
+                control.enabled = false;
+        }
+
+        playerRoot.SetParent(seatPosition);
+        playerRoot.localPosition = Vector3.zero;
+        playerRoot.localRotation = Quaternion.identity;
+
+        isInsideCar = true;
+
+        Debug.Log("Player masuk mobil!");
+    }
+
+    public void ExitCar()
+    {
+        if (!isInsideCar) return;
+
+        playerRoot.SetParent(null);
+
+        if (exitPosition != null)
+        {
+            playerRoot.position = exitPosition.position;
+            playerRoot.rotation = exitPosition.rotation;
+        }
+
+        foreach (Behaviour control in playerControls)
+        {
+            if (control != null)
+                control.enabled = true;
+        }
+
+        isInsideCar = false;
+
+        Debug.Log("Player keluar mobil!");
+    }
+}
