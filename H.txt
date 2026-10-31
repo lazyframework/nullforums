@@ -3,9 +3,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-/* Note: animations are called via the controller for both the character and capsule using animator null checks
- */
-
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
@@ -31,9 +28,8 @@ namespace StarterAssets
         // TAMBAHAN UNTUK JOYSTICK
         // ==========================================
         [Header("Mobile Joystick")]
-        public FixedJoystick moveJoystick;
+        public Joystick moveJoystick; // <-- Menggunakan class 'Joystick' agar lebih aman
         // ==========================================
-
 
 #if ENABLE_INPUT_SYSTEM 
         public void OnMove(InputValue value)
@@ -67,12 +63,10 @@ namespace StarterAssets
         {
             if (moveJoystick != null)
             {
-                // Membaca input dari joystick dan mengirimkannya ke fungsi MoveInput
                 MoveInput(new Vector2(moveJoystick.Horizontal, moveJoystick.Vertical));
             }
         }
         // ==========================================
-
 
         public void MoveInput(Vector2 newMoveDirection)
         {
