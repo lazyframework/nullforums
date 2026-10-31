@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
+/* Note: animations are called via the controller for both the character and capsule using animator null checks
+ */
+
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
@@ -23,17 +26,6 @@ namespace StarterAssets
         [Header("Mouse Cursor Settings")]
         public bool cursorLocked = true;
         public bool cursorInputForLook = true;
-
-        // --- INI VARIABEL YANG SEMPAT HILANG ---
-        public bool lookFromTouch; 
-        // ---------------------------------------
-
-        // ==========================================
-        // TAMBAHAN UNTUK JOYSTICK
-        // ==========================================
-        [Header("Mobile Joystick")]
-        public FixedJoystick moveJoystick; // Menggunakan FixedJoystick
-        // ==========================================
 
 #if ENABLE_INPUT_SYSTEM 
         public void OnMove(InputValue value)
@@ -59,18 +51,6 @@ namespace StarterAssets
             SprintInput(value.isPressed);
         }
 #endif
-
-        // ==========================================
-        // TAMBAHAN UPDATE UNTUK JOYSTICK
-        // ==========================================
-        private void Update()
-        {
-            if (moveJoystick != null)
-            {
-                MoveInput(new Vector2(moveJoystick.Horizontal, moveJoystick.Vertical));
-            }
-        }
-        // ==========================================
 
         public void MoveInput(Vector2 newMoveDirection)
         {
