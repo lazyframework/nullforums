@@ -1,0 +1,21 @@
+using UnityEngine;
+
+public class CarCameraFollow : MonoBehaviour
+{
+    public Transform target; // Tarik CarCameraTarget ke sini
+    public float smoothSpeed = 5f; // Seberapa mulus kamera bergerak
+
+    void LateUpdate()
+    {
+        if (target != null)
+        {
+            // Kamera mengikuti posisi target dengan mulus
+            Vector3 desiredPosition = target.position;
+            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+            transform.position = smoothedPosition;
+
+            // Kamera selalu melihat ke arah mobil
+            transform.LookAt(target.parent); 
+        }
+    }
+}
