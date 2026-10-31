@@ -1,0 +1,107 @@
+using UnityEngine;
+#if ENABLE_INPUT_SYSTEM 
+using UnityEngine.InputSystem;
+#endif
+
+/* Note: animations are called via the controller for both the character and capsule using animator null checks
+ */
+
+namespace StarterAssets
+{
+    [RequireComponent(typeof(CharacterController))]
+#if ENABLE_INPUT_SYSTEM 
+    [RequireComponent(typeof(PlayerInput))]
+#endif
+    public class StarterAssetsInputs : MonoBehaviour
+    {
+        [Header("Character Input Values")]
+        public Vector2 move;
+        public Vector2 look;
+        public bool jump;
+        public bool sprint;
+
+        [Header("Movement Settings")]
+        public bool analogMovement;
+
+        [Header("Mouse Cursor Settings")]
+        public bool cursorLocked = true;
+        public bool cursorInputForLook = true;
+
+        // ==========================================
+        // TAMBAHAN UNTUK JOYSTICK
+        // ==========================================
+        [Header("Mobile Joystick")]
+        public FixedJoystick moveJoystick;
+        // ==========================================
+
+
+#if ENABLE_INPUT_SYSTEM 
+        public void OnMove(InputValue value)
+        {
+            MoveInput(value.Get<Vector2>());
+        }
+
+        public void OnLook(InputValue value)
+        {
+            if(cursorInputForLook)
+            {
+                LookInput(value.Get<Vector2>());
+            }
+        }
+
+        public void OnJump(InputValue value)
+        {
+            JumpInput(value.isPressed);
+        }
+
+        public void OnSprint(InputValue value)
+        {
+            SprintInput(value.isPressed);
+        }
+#endif
+
+        // ==========================================
+        // TAMBAHAN UPDATE UNTUK JOYSTICK
+        // ==========================================
+        private void Update()
+        {
+            if (moveJoystick != null)
+            {
+                // Membaca input dari joystick dan mengirimkannya ke fungsi MoveInput
+                MoveInput(new Vector2(moveJoystick.Horizontal, moveJoystick.Vertical));
+            }
+        }
+        // ==========================================
+
+
+        public void MoveInput(Vector2 newMoveDirection)
+        {
+            move = newMoveDirection;
+        } 
+
+        public void LookInput(Vector2 newLookDirection)
+        {
+            look = newLookDirection;
+        }
+
+        public void JumpInput(bool newJumpState)
+        {
+            jump = newJumpState;
+        }
+
+        public void SprintInput(bool newSprintState)
+        {
+            sprint = newSprintState;
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            SetCursorState(cursorLocked);
+        }
+
+        private void SetCursorState(bool newState)
+        {
+            Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+        }
+    }
+}
