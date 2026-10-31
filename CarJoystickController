@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CarJoystickController : MonoBehaviour
 {
-    [Header("Joystick Input (Untuk Mobile)")]
+    [Header("Joystick Input")]
     public FixedJoystick joystick; 
 
     [Header("Car Settings")]
@@ -18,31 +18,19 @@ public class CarJoystickController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float moveInput = 0f;
-        float turnInput = 0f;
-
-        // Cek apakah ada input dari Joystick
-        if (joystick != null && (joystick.Horizontal != 0 || joystick.Vertical != 0))
+        if (joystick != null)
         {
-            moveInput = joystick.Vertical;
-            turnInput = joystick.Horizontal;
-        }
-        // Jika tidak ada Joystick, baca input Keyboard (WASD)
-        else
-        {
-            moveInput = Input.GetAxis("Vertical");
-            turnInput = Input.GetAxis("Horizontal");
-        }
+            float moveInput = joystick.Vertical;
+            float turnInput = joystick.Horizontal;
 
-        // Gerakkan mobil
-        Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
-        rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
+            Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
+            rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
 
-        // Putar mobil (hanya jika sedang bergerak)
-        if (Mathf.Abs(moveInput) > 0.1f)
-        {
-            Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
-            rb.MoveRotation(rb.rotation * turnRotation);
+            if (Mathf.Abs(moveInput) > 0.1f)
+            {
+                Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
+                rb.MoveRotation(rb.rotation * turnRotation);
+            }
         }
     }
 }
