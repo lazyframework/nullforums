@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Wajib ditambahkan
+using UnityEngine.InputSystem;
 
 public class CarJoystickController : MonoBehaviour
 {
@@ -9,8 +9,16 @@ public class CarJoystickController : MonoBehaviour
     [Header("Car Settings")]
     public float moveSpeed = 15f;    
     public float turnSpeed = 100f;   
+    public float wheelSpinSpeed = 200f; // Kecepatan putar roda
+
+    [Header("Wheels (Masukkan Roda ke Sini)")]
+    public Transform frontLeftWheel;
+    public Transform frontRightWheel;
+    public Transform rearLeftWheel;
+    public Transform rearRightWheel;
 
     private Rigidbody rb;
+    private float currentMoveInput; // Menyimpan nilai maju/mundur untuk roda
 
     void Start()
     {
@@ -22,32 +30,43 @@ public class CarJoystickController : MonoBehaviour
         float moveInput = 0f;
         float turnInput = 0f;
 
-        // 1. Cek Input dari Joystick (Jika ada)
+        // Baca Input Keyboard/Joystick
         if (joystick != null && (joystick.Horizontal != 0 || joystick.Vertical != 0))
         {
             moveInput = joystick.Vertical;
             turnInput = joystick.Horizontal;
         }
-        // 2. Cek Input dari Keyboard (WASD / Panah)
         else if (Keyboard.current != null)
         {
             if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveInput = 1f;
             if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) moveInput = -1f;
-            
             if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) turnInput = -1f;
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) turnInput = 1f;
         }
 
-        // 3. Fisika Mobil
-        // Maju/Mundur
+        currentMoveInput = moveInput;
+
+        // Gerakkan Mobil
         Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
         rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
 
-        // Belok
+        // Belokkan Mobil
         if (Mathf.Abs(moveInput) > 0.1f)
         {
             Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
             rb.MoveRotation(rb.rotation * turnRotation);
+        }
+
+        // --- LOGIKA MEMUTAR BAN ---
+        // Memutar ban sesuai kecepatan mobil (maju muter ke depan, mundur muter ke belakang)
+        if (currentMoveInput != 0)
+        {
+            float rotationAmount = currentMoveInput * wheelSpinSpeed * Time.fixedDeltaTime;
+            
+            if (frontLeftWheel != null) frontLeftWheel.Rotate(rotationAmount, 0, 0);
+            if (frontRightWheel != null) frontRightWheel.Rotate(rotationAmount, 0, 0);
+            if (rearLeftWheel != null) rearLeftWheel.Rotate(rotationAmount, 0, 0);
+            if (rearRightWheel != null) rearRightWheel.Rotate(rotationAmount, 0, 0);
         }
     }
 }
