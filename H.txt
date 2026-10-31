@@ -1,33 +1,38 @@
 using UnityEngine;
-using StarterAssets; // Wajib ada agar bisa akses script StarterAssetsInputs
+using StarterAssets; 
 
 public class JoystickToPlayer : MonoBehaviour
 {
-    [Header("Hubungkan Joystick Disini")]
+    [Header("Joystick Input (Hanya untuk Mobile)")]
     public FixedJoystick joystick;
 
-    // Variabel untuk menyimpan komponen StarterAssetsInputs di player ini
     private StarterAssetsInputs playerInputs;
 
     void Start()
     {
-        // Otomatis mencari komponen StarterAssetsInputs di objek ini (Player)
+        // Mengambil komponen StarterAssetsInputs di karakter ini
         playerInputs = GetComponent<StarterAssetsInputs>();
         
-        if (playerInputs == null)
+        // --- PENGECEKAN PLATFORM ---
+#if UNITY_EDITOR || UNITY_STANDALONE
+        // Jika main di PC, sembunyikan UI Joystick agar layar bersih
+        if (joystick != null && joystick.transform.parent != null)
         {
-            Debug.LogError("Script StarterAssetsInputs tidak ditemukan di objek ini!");
+            joystick.transform.parent.gameObject.SetActive(false);
         }
+#endif
     }
 
+#if UNITY_ANDROID || UNITY_IOS
+    // Update ini HANYA akan berjalan jika di-build ke Android/iOS
     void Update()
     {
-        // Jika joystick sudah dimasukkan dan komponen player ada
         if (joystick != null && playerInputs != null)
         {
-            // Baca nilai joystick dan kirim ke pergerakan player
+            // Baca nilai joystick dan timpa nilai input dari Starter Assets
             Vector2 input = new Vector2(joystick.Horizontal, joystick.Vertical);
             playerInputs.MoveInput(input);
         }
     }
+#endif
 }
