@@ -1,0 +1,39 @@
+using UnityEngine;
+
+public class CarJoystickController : MonoBehaviour
+{
+    [Header("Joystick Input")]
+    public FixedJoystick joystick; // Tarik objek Fixed Joystick ke sini
+
+    [Header("Car Settings")]
+    public float moveSpeed = 15f;    // Kecepatan maju/mundur
+    public float turnSpeed = 100f;   // Kecepatan berbelok
+
+    private Rigidbody rb;
+
+    void Start()
+    {
+        // Mengambil komponen Rigidbody yang ada di mobil
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void FixedUpdate()
+    {
+        // 1. Membaca nilai joystick (Horizontal untuk belok, Vertical untuk maju/mundur)
+        float moveInput = joystick.Vertical;
+        float turnInput = joystick.Horizontal;
+
+        // 2. Menggerakkan mobil maju/mundur dengan fisika
+        // Kita gunakan transform.forward agar mobil bergerak sesuai arah hadapnya
+        Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
+        rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
+
+        // 3. Memutar mobil (belok kiri/kanan)
+        // Hanya berbelok jika mobil sedang bergerak (moveInput != 0)
+        if (Mathf.Abs(moveInput) > 0.1f)
+        {
+            Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
+            rb.MoveRotation(rb.rotation * turnRotation);
+        }
+    }
+}
