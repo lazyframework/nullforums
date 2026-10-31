@@ -45,26 +45,20 @@ public class VehicleSystem : MonoBehaviour
     void EnterCar()
     {
         isInCar = true;
-        
         playerController.enabled = false;
         charController.enabled = false; 
-        
         player.transform.SetParent(car.transform); 
         player.transform.position = seatPosition.position;
-        
         car.GetComponent<CarJoystickController>().enabled = true;
     }
 
     void ExitCar()
     {
         isInCar = false;
-        
         player.transform.SetParent(null);
         player.transform.position = car.transform.position + (car.transform.right * -2f) + (Vector3.up * 1f);
-        
         playerController.enabled = true;
         charController.enabled = true;
-        
         car.GetComponent<CarJoystickController>().enabled = false;
     }
 }
