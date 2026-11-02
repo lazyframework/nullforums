@@ -1,0 +1,96 @@
+using UnityEngine;
+using StarterAssets;
+using UnityEngine.InputSystem;
+
+public class VehicleSystem : MonoBehaviour
+{
+    [Header("Referensi Kendaraan")]
+    public GameObject player;      
+    public GameObject car;         
+    public Transform carSeatPosition; 
+    
+    public GameObject bike;        // Tarik BMX_Bike ke sini
+    public Transform bikeSeatPosition; // Tarik posisi duduk sepeda ke sini
+
+    [Header("Referensi Kamera")]
+    public GameObject playerCamera; 
+    public GameObject carCamera;    
+    public GameObject bikeCamera;  // (Buat nanti, untuk sementara bisa dikosongkan)
+
+    private bool isInVehicle = false;
+    private bool isInBike = false;
+    private ThirdPersonController playerController;
+    private CharacterController charController;
+
+    void Start()
+    {
+        playerController = player.GetComponent<ThirdPersonController>();
+        charController = player.GetComponent<CharacterController>();
+        
+        if (car.GetComponent<CarJoystickController>() != null) car.GetComponent<CarJoystickController>().enabled = false;
+        if (bike.GetComponent<BikeController>() != null) bike.GetComponent<BikeController>().enabled = false;
+        
+        carCamera.SetActive(false); 
+        if(bikeCamera != null) bikeCamera.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (isInVehicle) 
+        {
+            if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame) ExitVehicle();
+            return;
+        }
+
+        float distToCar = Vector3.Distance(player.transform.position, car.transform.position);
+        float distToBike = Vector3.Distance(player.transform.position, bike.transform.position);
+
+        // Cek jika dekat mobil
+        if (distToCar <= 4f && Keyboard.current.eKey.wasPressedThisFrame) EnterCar();
+        // Cek jika dekat sepeda
+        else if (distToBike <= 3f && Keyboard.current.eKey.wasPressedThisFrame) EnterBike();
+    }
+
+    void EnterCar()
+    {
+        isInVehicle = true; isInBike = false;
+        playerController.enabled = false; charController.enabled = false; 
+        player.transform.SetParent(car.transform); 
+        player.transform.position = carSeatPosition.position;
+        
+        car.GetComponent<CarJoystickController>().enabled = true;
+        playerCamera.SetActive(false); carCamera.SetActive(true);
+    }
+
+    void EnterBike()
+    {
+        isInVehicle = true; isInBike = true;
+        playerController.enabled = false; charController.enabled = false; 
+        player.transform.SetParent(bike.transform); 
+        player.transform.position = bikeSeatPosition.position;
+        
+        bike.GetComponent<BikeController>().enabled = true;
+        
+        playerCamera.SetActive(false); 
+        if (bikeCamera != null) bikeCamera.SetActive(true);
+    }
+
+    void ExitVehicle()
+    {
+        isInVehicle = false;
+        player.transform.SetParent(null);
+        
+        if (isInBike) {
+            player.transform.position = bike.transform.position + (bike.transform.right * -1.5f) + (Vector3.up * 1f);
+            bike.GetComponent<BikeController>().enabled = false;
+            if (bikeCamera != null) bikeCamera.SetActive(false);
+        } else {
+            player.transform.position = car.transform.position + (car.transform.right * -2f) + (Vector3.up * 1f);
+            car.GetComponent<CarJoystickController>().enabled = false;
+            carCamera.SetActive(false);
+        }
+
+        playerController.enabled = true; charController.enabled = true;
+        playerCamera.SetActive(true);
+    }
+}
