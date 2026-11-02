@@ -9,23 +9,26 @@ public class VehicleSystem : MonoBehaviour
     public GameObject car;         
     public Transform carSeatPosition; 
     
-    public GameObject bike;        // Tarik BMX_Bike ke sini
-    public Transform bikeSeatPosition; // Tarik posisi duduk sepeda ke sini
+    public GameObject bike;        
+    public Transform bikeSeatPosition; 
 
     [Header("Referensi Kamera")]
     public GameObject playerCamera; 
     public GameObject carCamera;    
-    public GameObject bikeCamera;  // (Buat nanti, untuk sementara bisa dikosongkan)
+    public GameObject bikeCamera;  
 
     private bool isInVehicle = false;
     private bool isInBike = false;
+    
     private ThirdPersonController playerController;
     private CharacterController charController;
+    private Animator playerAnimator; 
 
     void Start()
     {
         playerController = player.GetComponent<ThirdPersonController>();
         charController = player.GetComponent<CharacterController>();
+        playerAnimator = player.GetComponent<Animator>(); 
         
         if (car.GetComponent<CarJoystickController>() != null) car.GetComponent<CarJoystickController>().enabled = false;
         if (bike.GetComponent<BikeController>() != null) bike.GetComponent<BikeController>().enabled = false;
@@ -38,6 +41,13 @@ public class VehicleSystem : MonoBehaviour
     {
         if (isInVehicle) 
         {
+            // Kunci posisi karakter agar selalu menempel di BikeSeat setiap frame
+            if (isInBike && bikeSeatPosition != null)
+            {
+                player.transform.position = bikeSeatPosition.position;
+                player.transform.rotation = bikeSeatPosition.rotation;
+            }
+
             if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame) ExitVehicle();
             return;
         }
@@ -45,9 +55,7 @@ public class VehicleSystem : MonoBehaviour
         float distToCar = Vector3.Distance(player.transform.position, car.transform.position);
         float distToBike = Vector3.Distance(player.transform.position, bike.transform.position);
 
-        // Cek jika dekat mobil
         if (distToCar <= 4f && Keyboard.current.eKey.wasPressedThisFrame) EnterCar();
-        // Cek jika dekat sepeda
         else if (distToBike <= 3f && Keyboard.current.eKey.wasPressedThisFrame) EnterBike();
     }
 
@@ -56,18 +64,27 @@ public class VehicleSystem : MonoBehaviour
         isInVehicle = true; isInBike = false;
         playerController.enabled = false; charController.enabled = false; 
         player.transform.SetParent(car.transform); 
+        
         player.transform.position = carSeatPosition.position;
+        player.transform.rotation = carSeatPosition.rotation;
         
         car.GetComponent<CarJoystickController>().enabled = true;
         playerCamera.SetActive(false); carCamera.SetActive(true);
+        
+        if (playerAnimator != null) playerAnimator.SetFloat("Speed", 0); 
     }
 
     void EnterBike()
     {
         isInVehicle = true; isInBike = true;
         playerController.enabled = false; charController.enabled = false; 
+        
+        // Karakter dibuat menjadi anak sepeda agar ikut bergerak
         player.transform.SetParent(bike.transform); 
+        
+        // Mengunci posisi PERSIS di BikeSeat
         player.transform.position = bikeSeatPosition.position;
+        player.transform.rotation = bikeSeatPosition.rotation;
         
         bike.GetComponent<BikeController>().enabled = true;
         
@@ -92,5 +109,7 @@ public class VehicleSystem : MonoBehaviour
 
         playerController.enabled = true; charController.enabled = true;
         playerCamera.SetActive(true);
+        
+        if (playerAnimator != null) playerAnimator.SetFloat("Speed", 0);
     }
 }
