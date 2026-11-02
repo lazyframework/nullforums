@@ -1,0 +1,19 @@
+using UnityEngine;
+
+public class PedalRotator : MonoBehaviour
+{
+    public float rotationSpeed = 300f; // Kecepatan putaran pedal
+    private float currentSpeed = 0f;
+
+    void Update()
+    {
+        // Memutar pedal pada sumbu X (maju/mundur)
+        transform.Rotate(Vector3.right * currentSpeed * Time.deltaTime);
+    }
+
+    // Fungsi ini akan dipanggil oleh script BikeController
+    public void SetSpeed(float speed)
+    {
+        currentSpeed = speed;
+    }
+}
