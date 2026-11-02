@@ -1,0 +1,42 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class BikeController : MonoBehaviour
+{
+    public float moveSpeed = 10f;
+    public float turnSpeed = 80f;
+
+    private Rigidbody rb;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        // Agar sepeda tidak mudah jatuh/terbalik
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+    }
+
+    void FixedUpdate()
+    {
+        float moveInput = 0f;
+        float turnInput = 0f;
+
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.wKey.isPressed) moveInput = 1f;
+            if (Keyboard.current.sKey.isPressed) moveInput = -1f;
+            if (Keyboard.current.aKey.isPressed) turnInput = -1f;
+            if (Keyboard.current.dKey.isPressed) turnInput = 1f;
+        }
+
+        // Gerakkan maju/mundur
+        Vector3 moveOffset = transform.forward * moveInput * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + moveOffset);
+
+        // Belok (hanya jika sedang jalan)
+        if (Mathf.Abs(moveInput) > 0.1f)
+        {
+            Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
+            rb.MoveRotation(rb.rotation * turnRotation);
+        }
+    }
+}
