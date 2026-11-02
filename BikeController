@@ -9,22 +9,18 @@ public class BikeController : MonoBehaviour
     public float pedalRotationSpeed = 300f; // Kecepatan putar pedal
 
     private Rigidbody rb;
-    private Animator playerAnimator; 
-    private PedalRotator pedalScript; // Referensi ke script pedal
+    private CyclingLegs legs; // Script kaki + pedal
 
     void Start()
     {
         // Ambil komponen Rigidbody
         rb = GetComponent<Rigidbody>();
-        
+
         // Kunci rotasi sepeda agar tidak jatuh/miring ke samping
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        
-        // Cari komponen Animator pada karakter (karena karakter sudah jadi anak sepeda)
-        playerAnimator = GetComponentInChildren<Animator>();
 
-        // Cari script PedalRotator yang menempel pada objek Cranks/Pedals
-        pedalScript = GetComponentInChildren<PedalRotator>();
+        // Cari script CyclingLegs pada karakter (karakter sudah jadi anak sepeda)
+        legs = GetComponentInChildren<CyclingLegs>();
     }
 
     void FixedUpdate()
@@ -42,7 +38,6 @@ public class BikeController : MonoBehaviour
         }
 
         // --- 1. PERGERAKAN SEPEDA ---
-        // Menggunakan linearVelocity agar pergerakan halus dan tidak menembus objek
         Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
         rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
 
@@ -53,19 +48,11 @@ public class BikeController : MonoBehaviour
             rb.MoveRotation(rb.rotation * turnRotation);
         }
 
-        // --- 3. ANIMASI KAKI KARAKTER ---
-        if (playerAnimator != null)
+        // --- 3. PUTARAN PEDAL + KAKI ---
+        // CyclingLegs memutar crank/pedal dan menggerakkan kaki mengikutinya
+        if (legs != null)
         {
-            // Menggunakan animasi lari (Speed) agar kaki bergerak seperti mengayuh
-            float animSpeed = Mathf.Abs(moveInput);
-            playerAnimator.SetFloat("Speed", animSpeed * 2f); 
-        }
-
-        // --- 4. PUTARAN PEDAL SEPEDA ---
-        if (pedalScript != null)
-        {
-            // Kirim nilai kecepatan ke script pedal agar ikut berputar sesuai arah maju/mundur
-            pedalScript.SetSpeed(moveInput * pedalRotationSpeed);
+            legs.SetSpeed(moveInput * pedalRotationSpeed);
         }
     }
 }
