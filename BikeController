@@ -5,14 +5,16 @@ public class BikeController : MonoBehaviour
 {
     public float moveSpeed = 10f;
     public float turnSpeed = 80f;
-
+    
     private Rigidbody rb;
+    private Animator playerAnimator; 
+    private float currentSpeed = 0f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        // Agar sepeda tidak mudah jatuh/terbalik
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        playerAnimator = GetComponentInChildren<Animator>();
     }
 
     void FixedUpdate()
@@ -28,15 +30,22 @@ public class BikeController : MonoBehaviour
             if (Keyboard.current.dKey.isPressed) turnInput = 1f;
         }
 
-        // Gerakkan maju/mundur
-        Vector3 moveOffset = transform.forward * moveInput * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + moveOffset);
+        // Pergerakan maju/mundur menggunakan Velocity agar lebih stabil
+        Vector3 moveDirection = transform.forward * moveInput * moveSpeed;
+        rb.linearVelocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
 
-        // Belok (hanya jika sedang jalan)
+        // Belok
         if (Mathf.Abs(moveInput) > 0.1f)
         {
             Quaternion turnRotation = Quaternion.Euler(0f, turnInput * turnSpeed * Time.fixedDeltaTime, 0f);
             rb.MoveRotation(rb.rotation * turnRotation);
+        }
+
+        // Animasi Kaki
+        if (playerAnimator != null)
+        {
+            currentSpeed = Mathf.Abs(moveInput);
+            playerAnimator.SetFloat("Speed", currentSpeed * 2f); 
         }
     }
 }
