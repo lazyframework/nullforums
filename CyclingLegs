@@ -19,6 +19,9 @@ public class CyclingLegs : MonoBehaviour
     private float angle;
     private float speed;
 
+    // Untuk debug (bola merah/hijau di Scene view)
+    private Vector3 dbgL, dbgR;
+
     void Awake()
     {
         anim = GetComponent<Animator>();
@@ -48,6 +51,8 @@ public class CyclingLegs : MonoBehaviour
 
     void OnAnimatorIK(int layerIndex)
     {
+        Debug.Log("IK jalan, layer " + layerIndex + " | crankLength = " + crankLength);
+
         Foot(AvatarIKGoal.RightFoot, AvatarIKHint.RightKnee, HumanBodyBones.RightUpperLeg, angle + startAngle, 1f);
         Foot(AvatarIKGoal.LeftFoot,  AvatarIKHint.LeftKnee,  HumanBodyBones.LeftUpperLeg,  angle + startAngle + 180f, -1f);
     }
@@ -60,6 +65,9 @@ public class CyclingLegs : MonoBehaviour
                     + bike.right * (side * sideOffset)
                     + bike.up * footUpOffset;
 
+        // Simpan untuk debug
+        if (goal == AvatarIKGoal.RightFoot) dbgR = pos; else dbgL = pos;
+
         anim.SetIKPositionWeight(goal, 1f);
         anim.SetIKRotationWeight(goal, 1f);
         anim.SetIKPosition(goal, pos);
@@ -68,6 +76,12 @@ public class CyclingLegs : MonoBehaviour
         // Lutut menekuk ke depan
         anim.SetIKHintPositionWeight(hint, 1f);
         anim.SetIKHintPosition(hint, anim.GetBoneTransform(thigh).position + bike.forward * 0.5f);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;   Gizmos.DrawSphere(dbgR, 0.05f);
+        Gizmos.color = Color.green; Gizmos.DrawSphere(dbgL, 0.05f);
     }
 
     static Vector3 Abs(Vector3 v) => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
